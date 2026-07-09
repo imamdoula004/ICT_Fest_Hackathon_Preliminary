@@ -8,7 +8,7 @@ Welcome to the solution walkthrough for the CoWork Multi-Tenant Coworking Space 
 
 We solved critical concurrency bugs (such as deadlocks, lost updates, and race conditions) by designing a granular lock isolation architecture.
 
-### 1. Deadlock Elimination (Lock Acquisition Order)
+### Deadlock Elimination (Lock Acquisition Order)
 The original service crashed under concurrent load because `notify_created` acquired locks in the order `Email -> Audit`, while `notify_cancelled` acquired them in reverse (`Audit -> Email`). We standardized the lock acquisition order across the entire application to prevent deadlocks:
 
 ![Concurrency Walkthrough](docs/concurrency_walkthrough.svg)
