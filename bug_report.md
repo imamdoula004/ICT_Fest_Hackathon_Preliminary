@@ -1,5 +1,7 @@
 # CoWork REST API — Solution Walkthrough & Bug Report
 
+![CoWork Banner](docs/cowork_banner.png)
+
 Welcome to the official Solution Walkthrough and Bug Report for the **CoWork Multi-Tenant Coworking Space Booking API**. 
 
 This document contains a comprehensive manual evaluation catalog of all **17 bugs** identified and fixed during the preliminary round. Each bug description includes the **file paths, original line numbers, buggy code, corrected code, explanation of the failure, and custom animated SVG diagrams** illustrating our thread-safe concurrency model and business pipelines.
