@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="100%">
+  <style>
+    @keyframes threadA {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(110px, 0); }
+      40% { transform: translate(110px, 0); }
+      100% { transform: translate(110px, 0); }
+    }
+    @keyframes threadB {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-110px, 0); }
+      40% { transform: translate(-110px, 0); }
+      100% { transform: translate(-110px, 0); }
+    }
+    @keyframes resolvedA {
+      0% { transform: translate(0, 0); opacity: 1; }
+      20% { transform: translate(110px, 0); }
+      40% { transform: translate(110px, 80px); }
+      60% { transform: translate(250px, 80px); opacity: 0; }
+      100% { transform: translate(0, 0); opacity: 0; }
+    }
+    @keyframes resolvedB {
+      0% { transform: translate(0, 0); opacity: 1; }
+      20% { transform: translate(0, 0); }
+      40% { transform: translate(110px, 0); }
+      60% { transform: translate(110px, 80px); }
+      80% { transform: translate(250px, 80px); opacity: 0; }
+      100% { transform: translate(0, 0); opacity: 0; }
+    }
+    .text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 14px; fill: #ffffff; font-weight: 500; }
+    .title { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: bold; }
+    .label { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; fill: #9ca3af; text-anchor: middle; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .lock-label { font-size: 12px; font-weight: bold; fill: #f3f4f6; }
+  </style>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+
+  <!-- Left: Buggy (Deadlock) -->
+  <g transform="translate(10, 0)">
+    <text x="30" y="40" class="title" fill="#f87171">Buggy Concurrency (Deadlock)</text>
+    
+    <!-- Lock boxes -->
+    <rect x="50" y="80" width="100" height="50" class="box" />
+    <text x="100" y="110" class="text lock-label" text-anchor="middle">Email Lock</text>
+    
+    <rect x="210" y="80" width="100" height="50" class="box" />
+    <text x="260" y="110" class="text lock-label" text-anchor="middle">Audit Lock</text>
+
+    <!-- Thread A (Create) -->
+    <circle cx="50" cy="180" r="10" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2" style="animation: threadA 4s infinite alternate ease-in-out;" />
+    <text x="50" y="210" class="label">Thread A (Create)</text>
+
+    <!-- Thread B (Cancel) -->
+    <circle cx="310" cy="180" r="10" fill="#ec4899" stroke="#be185d" stroke-width="2" style="animation: threadB 4s infinite alternate ease-in-out;" />
+    <text x="310" y="210" class="label">Thread B (Cancel)</text>
+
+    <!-- Deadlock indicator -->
+    <path d="M 160 105 L 200 105" stroke="#ef4444" stroke-width="3" stroke-dasharray="4" />
+    <text x="180" y="95" font-family="sans-serif" font-size="10" fill="#ef4444" font-weight="bold" text-anchor="middle">WAIT</text>
+  </g>
+
+  <!-- Right: Fixed (Resolved) -->
+  <g transform="translate(410, 0)">
+    <text x="30" y="40" class="title" fill="#34d399">Fixed Concurrency (Deadlock-Free)</text>
+    
+    <!-- Lock boxes -->
+    <rect x="50" y="80" width="100" height="50" class="box" />
+    <text x="100" y="110" class="text lock-label" text-anchor="middle">Email Lock</text>
+    
+    <rect x="50" y="160" width="100" height="50" class="box" />
+    <text x="100" y="190" class="text lock-label" text-anchor="middle">Audit Lock</text>
+
+    <!-- Thread A (Create) -->
+    <circle cx="20" cy="105" r="10" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2" style="animation: resolvedA 4s infinite ease-in-out;" />
+    <text x="100" y="260" class="label" fill="#3b82f6">Thread A (Create)</text>
+
+    <!-- Thread B (Cancel) -->
+    <circle cx="20" cy="105" r="10" fill="#ec4899" stroke="#be185d" stroke-width="2" style="animation: resolvedB 4s infinite ease-in-out;" />
+    <text x="220" y="260" class="label" fill="#ec4899">Thread B (Cancel)</text>
+  </g>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" width="100%">
+  <style>
+    @keyframes parseFlow {
+      0% { transform: translate(0, 0); opacity: 0; }
+      10% { opacity: 1; }
+      40% { transform: translate(250px, 0); }
+      70% { transform: translate(500px, 0); }
+      90% { opacity: 1; }
+      100% { transform: translate(500px, 0); opacity: 0; }
+    }
+    @keyframes timeChange {
+      0% { content: "18:00:00+02:00"; }
+      45% { content: "18:00:00+02:00"; }
+      55% { content: "16:00:00 UTC"; }
+      100% { content: "16:00:00 UTC"; }
+    }
+    .text { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: bold; fill: #60a5fa; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .badge { fill: #2563eb; rx: 4; }
+    .db { fill: #059669; stroke: #10b981; stroke-width: 2; rx: 6; }
+  </style>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+
+  <text x="30" y="35" class="title">Datetime Normalisation Pipeline</text>
+
+  <!-- Pipeline Stages -->
+  <g transform="translate(40, 60)">
+    <!-- Stage 1: Input -->
+    <rect x="0" y="30" width="160" height="60" class="box" />
+    <text x="80" y="55" class="text" text-anchor="middle" font-weight="bold">1. API Request Input</text>
+    <text x="80" y="75" class="text" text-anchor="middle" fill="#9ca3af" font-size="11">18:00:00+02:00 (ISO)</text>
+
+    <!-- Stage 2: Normalizer -->
+    <rect x="260" y="30" width="180" height="60" class="box" stroke="#60a5fa" />
+    <text x="350" y="55" class="text" text-anchor="middle" font-weight="bold" fill="#60a5fa">2. UTC Normalization</text>
+    <text x="350" y="75" class="text" text-anchor="middle" fill="#9ca3af" font-size="11">Shift Offset to GMT+0</text>
+
+    <!-- Stage 3: Database -->
+    <rect x="540" y="30" width="160" height="60" class="db" />
+    <text x="620" y="55" class="text" text-anchor="middle" font-weight="bold">3. SQLite Storage</text>
+    <text x="620" y="75" class="text" text-anchor="middle" fill="#a7f3d0" font-size="11">16:00:00 (Naive UTC)</text>
+
+    <!-- Connections -->
+    <path d="M 160 60 L 260 60" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 440 60 L 540 60" stroke="#4b5563" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Animated Data Packet -->
+    <g style="animation: parseFlow 4s infinite ease-in-out;">
+      <rect x="-10" y="10" width="120" height="24" class="badge" />
+      <!-- We use individual letters/labels since SVG text content animation via CSS is not fully standard in all browsers -->
+      <text x="50" y="26" class="text" font-size="11" font-weight="bold" text-anchor="middle">Processing...</text>
+    </g>
+  </g>
+
+  <!-- Definition of Marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 10 5 L 0 8 z" fill="#4b5563" />
+    </marker>
+  </defs>
+</svg>
