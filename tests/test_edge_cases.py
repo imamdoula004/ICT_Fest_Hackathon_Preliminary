@@ -305,3 +305,24 @@ def test_concurrency_double_cancellation():
         assert len(refunds) == 1
     finally:
         db.close()
+
+
+def test_rate_limiting():
+    org = f"org-rl-{datetime.now().timestamp()}"
+    client.post("/auth/register", json={"org_name": org, "username": "bob", "password": "password"})
+    login = client.post("/auth/login", json={"org_name": org, "username": "bob", "password": "password"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    # We send 21 requests to /bookings
+    # First 20 will return 400 or 404 (e.g. ROOM_NOT_FOUND since room_id=99999 is invalid)
+    # The 21st must return 429 RATE_LIMITED.
+    status_codes = []
+    for _ in range(21):
+        res = client.post("/bookings", json={"room_id": 99999, "start_time": _future(5), "end_time": _future(6)}, headers=headers)
+        status_codes.append(res.status_code)
+
+    # First 20 are NOT 429
+    assert all(code != 429 for code in status_codes[:20])
+    # The 21st is 429
+    assert status_codes[20] == 429
+
