@@ -4,13 +4,13 @@
 
 Welcome to the official Solution Walkthrough and Bug Report for the **CoWork Multi-Tenant Coworking Space Booking API**. 
 
-This document contains a comprehensive manual evaluation catalog of all **17 bugs** identified and fixed during the preliminary round. Each bug description includes the **file paths, original line numbers, buggy code, corrected code, explanation of the failure, and custom animated SVG diagrams** illustrating our thread-safe concurrency model and business pipelines.
+This document contains a comprehensive manual evaluation catalog of all **20 bugs** identified and fixed during the preliminary round. Each bug description includes the **file paths, original line numbers, buggy code, corrected code, explanation of the failure, and custom animated SVG diagrams** illustrating our thread-safe concurrency model and business pipelines.
 
 ---
 
 ## 📋 Summary of Bug Fixes
 
-Here is a quick summary table of all the 17 bugs resolved in this repository:
+Here is a quick summary table of all the 20 bugs resolved in this repository:
 
 | # | Bug Title | Target File | Issue Type | Resolution |
 |---|---|---|---|---|
