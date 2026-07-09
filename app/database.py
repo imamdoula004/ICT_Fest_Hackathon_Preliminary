@@ -1,8 +1,16 @@
 """Database engine and session management."""
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from .config import DATABASE_URL
+
+if DATABASE_URL.startswith("sqlite:///"):
+    db_path = DATABASE_URL[9:]
+    if db_path != ":memory:":
+        db_dir = os.path.dirname(db_path)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
 
 engine = create_engine(
     DATABASE_URL,
