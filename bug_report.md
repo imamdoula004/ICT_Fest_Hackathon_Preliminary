@@ -31,6 +31,7 @@ Here is a quick summary table of all the 17 bugs resolved in this repository:
 | **15** | Half-Cent Rounding Up | `app/services/refunds.py` | Business Rule | Used integer arithmetic `(price + 1) // 2` to round up. |
 | **16** | Export Security Leak | `app/routers/admin.py` | Security | Verified room organization ownership before CSV export. |
 | **17** | Concurrency Deadlock | `app/services/notifications.py`| Concurrency | Standardised locking order to Email -> Audit lock. |
+| **18** | Cache Dictionary Race | `app/cache.py` | Concurrency | Added thread lock to prevent concurrent modification exceptions. |
 
 ---
 
@@ -413,6 +414,28 @@ def notify_cancelled(booking) -> None:
 * **File(s)**: `app/services/ratelimit.py`, `app/services/reference.py`, `app/services/stats.py`, and `app/routers/bookings.py`
 * **Why they were a problem**: Read-modify-write operations on shared in-memory dictionaries, counters, list buckets, and database overlap checks had sleeps in-between without thread lock synchronization, causing races under concurrent requests.
 * **How they were fixed**: Wrapped all write paths in threading locks (room locks, user locks, reference locks, and transaction locks).
+
+---
+
+### Bug 18: In-memory Cache Mutation Concurrency Race
+* **File**: `app/cache.py` (L8-L35)
+* **Buggy Code**:
+```python
+def invalidate_report(org_id: int) -> None:
+    for key in [k for k in _report_cache if k[0] == org_id]:
+        _report_cache.pop(key, None)
+```
+* **Why it was a problem**: Accessing and mutatively popping keys from the in-memory `_report_cache` dictionary concurrently in high-frequency read/write environments (e.g. creating bookings while concurrently loading reports) causes a Python dictionary mutation conflict, throwing `RuntimeError: dictionary changed size during iteration`.
+* **Corrected Code**:
+```python
+_cache_lock = threading.Lock()
+...
+def invalidate_report(org_id: int) -> None:
+    with _cache_lock:
+        for key in [k for k in _report_cache if k[0] == org_id]:
+            _report_cache.pop(key, None)
+```
+* **Why/How it was fixed**: Bound all read, write, and invalidation calls to `_report_cache` and `_availability_cache` under a thread-safe mutex lock `_cache_lock`.
 
 ---
 
