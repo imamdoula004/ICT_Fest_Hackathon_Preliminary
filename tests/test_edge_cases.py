@@ -360,3 +360,27 @@ def test_cancellation_availability_cache_invalidation():
     assert len(avail2.json()["busy"]) == 0
 
 
+def test_back_to_back_bookings():
+    org = f"org-btb-{datetime.now().timestamp()}"
+    client.post("/auth/register", json={"org_name": org, "username": "bob", "password": "password"})
+    login = client.post("/auth/login", json={"org_name": org, "username": "bob", "password": "password"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    room = client.post("/rooms", json={"name": "Room A", "capacity": 2, "hourly_rate_cents": 1000}, headers=headers)
+    room_id = room.json()["id"]
+
+    start1 = _future(24)
+    end1 = _future(26)
+    start2 = end1
+    end2 = _future(28)
+
+    # Booking 1: Should succeed
+    b1 = client.post("/bookings", json={"room_id": room_id, "start_time": start1, "end_time": end1}, headers=headers)
+    assert b1.status_code == 201
+
+    # Booking 2: Should succeed (back-to-back)
+    b2 = client.post("/bookings", json={"room_id": room_id, "start_time": start2, "end_time": end2}, headers=headers)
+    assert b2.status_code == 201
+
+
+

@@ -33,6 +33,7 @@ Here is a quick summary table of all the 17 bugs resolved in this repository:
 | **17** | Concurrency Deadlock | `app/services/notifications.py`| Concurrency | Standardised locking order to Email -> Audit lock. |
 | **18** | Cache Dictionary Race | `app/cache.py` | Concurrency | Added thread lock to prevent concurrent modification exceptions. |
 | **19** | Availability Cache Leak| `app/routers/bookings.py` | Cache | Invalidated availability cache on booking cancellation. |
+| **20** | Back-to-Back Overlap   | `app/routers/bookings.py` | Validation | Replaced <= with < in conflict checks to allow back-to-back bookings. |
 
 ---
 
@@ -462,18 +463,37 @@ def invalidate_report(org_id: int) -> None:
 
 ---
 
+### Bug 20: Back-to-Back Booking Overlap Validation Error
+* **File**: `app/routers/bookings.py` (L53)
+* **Buggy Code**:
+```python
+    for b in existing:
+        if b.start_time <= end and start <= b.end_time:
+            return True
+```
+* **Why it was a problem**: Checking conflicts using `<=` incorrectly flagged back-to-back bookings (one starting exactly when another ends) as overlapping. This directly violated Business Rule 3: *"Back-to-back bookings (one ending exactly when the other starts) are allowed"*.
+* **Corrected Code**:
+```python
+    for b in existing:
+        if b.start_time < end and start < b.end_time:
+            return True
+```
+* **Why/How it was fixed**: Replaced the `<=` operators with strictly `<` operators to correctly implement the overlap logic: `existing.start_time < new.end_time AND new.start_time < existing.end_time`.
+
+---
+
 ## 🧪 Testing & Verification
 
 We implemented a robust test suite in `tests/test_edge_cases.py` to assert correct behavior.
 
-All 13 tests passed successfully:
+All 14 tests passed successfully:
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0
-collected 13 items
+collected 14 items
 
-tests\test_edge_cases.py ............                                    [ 92%]
+tests\test_edge_cases.py .............                                   [ 92%]
 tests\test_smoke.py .                                                    [100%]
 
-======================= 13 passed, 1 warning in 81.59s ========================
+======================= 14 passed, 1 warning in 87.45s ========================
 ```
