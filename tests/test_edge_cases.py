@@ -383,4 +383,39 @@ def test_back_to_back_bookings():
     assert b2.status_code == 201
 
 
+def test_booking_visibility_non_owner():
+    org = f"org-vis-{datetime.now().timestamp()}"
+    # Register Admin (automatically created)
+    client.post("/auth/register", json={"org_name": org, "username": "admin1", "password": "password"})
+    login_admin = client.post("/auth/login", json={"org_name": org, "username": "admin1", "password": "password"})
+    headers_admin = {"Authorization": f"Bearer {login_admin.json()['access_token']}"}
+    
+    # Register Member 1
+    client.post("/auth/register", json={"org_name": org, "username": "bob", "password": "password"})
+    login_bob = client.post("/auth/login", json={"org_name": org, "username": "bob", "password": "password"})
+    headers_bob = {"Authorization": f"Bearer {login_bob.json()['access_token']}"}
+
+    # Register Member 2
+    client.post("/auth/register", json={"org_name": org, "username": "charlie", "password": "password"})
+    login_charlie = client.post("/auth/login", json={"org_name": org, "username": "charlie", "password": "password"})
+    headers_charlie = {"Authorization": f"Bearer {login_charlie.json()['access_token']}"}
+
+    # Create room by admin
+    room = client.post("/rooms", json={"name": "Room A", "capacity": 2, "hourly_rate_cents": 1000}, headers=headers_admin)
+    room_id = room.json()["id"]
+
+    # Bob creates a booking
+    start = _future(24)
+    end = _future(26)
+    b = client.post("/bookings", json={"room_id": room_id, "start_time": start, "end_time": end}, headers=headers_bob)
+    assert b.status_code == 201
+    b_id = b.json()["id"]
+
+    # Charlie (another member) attempts to read Bob's booking -> Should fail (404)
+    read_res = client.get(f"/bookings/{b_id}", headers=headers_charlie)
+    assert read_res.status_code == 404
+    assert read_res.json()["code"] == "BOOKING_NOT_FOUND"
+
+
+
 

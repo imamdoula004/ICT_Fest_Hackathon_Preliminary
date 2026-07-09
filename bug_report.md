@@ -4,13 +4,13 @@
 
 Welcome to the official Solution Walkthrough and Bug Report for the **CoWork Multi-Tenant Coworking Space Booking API**. 
 
-This document contains a comprehensive manual evaluation catalog of all **20 bugs** identified and fixed during the preliminary round. Each bug description includes the **file paths, original line numbers, buggy code, corrected code, explanation of the failure, and custom animated SVG diagrams** illustrating our thread-safe concurrency model and business pipelines.
+This document contains a comprehensive manual evaluation catalog of all **21 bugs** identified and fixed during the preliminary round. Each bug description includes the **file paths, original line numbers, buggy code, corrected code, explanation of the failure, and custom animated SVG diagrams** illustrating our thread-safe concurrency model and business pipelines.
 
 ---
 
 ## 📋 Summary of Bug Fixes
 
-Here is a quick summary table of all the 20 bugs resolved in this repository:
+Here is a quick summary table of all the 21 bugs resolved in this repository:
 
 | # | Bug Title | Target File | Issue Type | Resolution |
 |---|---|---|---|---|
@@ -34,6 +34,7 @@ Here is a quick summary table of all the 20 bugs resolved in this repository:
 | **18** | Cache Dictionary Race | `app/cache.py` | Concurrency | Added thread lock to prevent concurrent modification exceptions. |
 | **19** | Availability Cache Leak| `app/routers/bookings.py` | Cache | Invalidated availability cache on booking cancellation. |
 | **20** | Back-to-Back Overlap   | `app/routers/bookings.py` | Validation | Replaced <= with < in conflict checks to allow back-to-back bookings. |
+| **21** | Booking Detail Visibility| `app/routers/bookings.py` | Security | Checked booking owner for non-admin members in GET detail route. |
 
 ---
 
@@ -482,18 +483,42 @@ def invalidate_report(org_id: int) -> None:
 
 ---
 
+### Bug 21: Booking Detail Visibility Check Bypass
+* **File**: `app/routers/bookings.py` (L167-L170)
+* **Buggy Code**:
+```python
+    if booking is None:
+        raise AppError(404, "BOOKING_NOT_FOUND", "Booking not found")
+
+    response = serialize_booking(booking)
+```
+* **Why it was a problem**: The booking detail endpoint (`GET /bookings/{booking_id}`) failed to verify user ownership for non-admin members. Any member could query and view other members' bookings by id, directly violating Business Rule 10: *"Members may read and cancel only their own bookings (another member's booking id → 404 BOOKING_NOT_FOUND)"*.
+* **Corrected Code**:
+```python
+    if booking is None:
+        raise AppError(404, "BOOKING_NOT_FOUND", "Booking not found")
+
+    if user.role != "admin" and booking.user_id != user.id:
+        raise AppError(404, "BOOKING_NOT_FOUND", "Booking not found")
+
+    response = serialize_booking(booking)
+```
+* **Why/How it was fixed**: Enforced an ownership validation check in the `get_booking` endpoint, raising `404 BOOKING_NOT_FOUND` if the user is a non-admin member and does not own the booking.
+
+---
+
 ## 🧪 Testing & Verification
 
 We implemented a robust test suite in `tests/test_edge_cases.py` to assert correct behavior.
 
-All 14 tests passed successfully:
+All 15 tests passed successfully:
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0
-collected 14 items
+collected 15 items
 
-tests\test_edge_cases.py .............                                   [ 92%]
+tests\test_edge_cases.py ..............                                  [ 93%]
 tests\test_smoke.py .                                                    [100%]
 
-======================= 14 passed, 1 warning in 87.45s ========================
+======================= 15 passed, 1 warning in 95.96s ========================
 ```
