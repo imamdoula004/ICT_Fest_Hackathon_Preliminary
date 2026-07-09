@@ -6,6 +6,32 @@ This document contains a comprehensive manual evaluation catalog of all **17 bug
 
 ---
 
+## 📋 Summary of Bug Fixes
+
+Here is a quick summary table of all the 17 bugs resolved in this repository:
+
+| # | Bug Title | Target File | Issue Type | Resolution |
+|---|---|---|---|---|
+| **1** | Timezone Offset Loss | `app/timeutils.py` | Timezone Shift | Convert to UTC before stripping timezone metadata. |
+| **2** | Access Token Expiration | `app/auth.py` | Security | Corrected access token lifetime from 15h to 15m (900s). |
+| **3** | Revoked Access Token | `app/auth.py` | Security | Checked blacklist by token `jti` instead of user ID `sub`. |
+| **4** | Duplicate Register Code | `app/routers/auth.py` | Validation | Returned `409 USERNAME_TAKEN` instead of `201 Created`. |
+| **5** | Register Concurrency Race | `app/routers/auth.py` | Concurrency | Added db transaction rollback and `IntegrityError` handling. |
+| **6** | Refresh Token Reuse | `app/routers/auth.py` | Security | Enforced single-use refresh token rotation thread-safely. |
+| **7** | Past Booking starts | `app/routers/bookings.py` | Validation | Checked strictly `start <= now` to enforce future slots. |
+| **8** | Minimum Booking Duration | `app/routers/bookings.py` | Validation | Enforced minimum booking duration of at least 1 hour. |
+| **9** | Report Cache Stale | `app/routers/bookings.py` | Cache | Invalidated usage reports cache on booking creation. |
+| **10** | Pagination Offset | `app/routers/bookings.py` | Pagination | Corrected formula to `(page - 1) * limit`. |
+| **11** | Pagination Limit | `app/routers/bookings.py` | Pagination | Replaced hardcoded `.limit(10)` with query parameter. |
+| **12** | Pagination Sort Order | `app/routers/bookings.py` | Pagination | Changed sorting to ascending start time and ID. |
+| **13** | Detail start_time Override | `app/routers/bookings.py` | API Contract | Preserved slot start time in booking detail response. |
+| **14** | Cancel Notice Tiers | `app/routers/bookings.py` | Business Rule | Standardised notice thresholds and set default refund to 0%. |
+| **15** | Half-Cent Rounding Up | `app/services/refunds.py` | Business Rule | Used integer arithmetic `(price + 1) // 2` to round up. |
+| **16** | Export Security Leak | `app/routers/admin.py` | Security | Verified room organization ownership before CSV export. |
+| **17** | Concurrency Deadlock | `app/services/notifications.py`| Concurrency | Standardised locking order to Email -> Audit lock. |
+
+---
+
 ## ⚡ Concurrency & Lock Architecture
 
 We solved critical concurrency bugs (such as deadlocks, lost updates, and database locking races) by designing a granular lock isolation architecture.
