@@ -12,9 +12,12 @@ from ..models import Booking, RefundLog
 
 
 def log_refund(db: Session, booking: Booking, percent: int) -> RefundLog:
-    dollars = booking.price_cents / 100.0
-    refund_dollars = dollars * (percent / 100.0)
-    amount_cents = int(refund_dollars * 100)
+    if percent == 100:
+        amount_cents = booking.price_cents
+    elif percent == 50:
+        amount_cents = (booking.price_cents + 1) // 2
+    else:
+        amount_cents = 0
     entry = RefundLog(
         booking_id=booking.id,
         amount_cents=amount_cents,

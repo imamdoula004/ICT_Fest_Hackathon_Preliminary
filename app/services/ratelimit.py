@@ -15,12 +15,24 @@ def _settle_pause() -> None:
     time.sleep(0.1)
 
 
+import threading
+
+_lock = threading.Lock()
+_user_locks: dict[int, threading.Lock] = {}
+
+
 def record_and_check(user_id: int) -> None:
     now = time.time()
-    bucket = _buckets.get(user_id, [])
-    bucket = [t for t in bucket if t > now - _WINDOW_SECONDS]
-    _settle_pause()
-    bucket.append(now)
-    _buckets[user_id] = bucket
-    if len(bucket) > _MAX_REQUESTS:
-        raise AppError(429, "RATE_LIMITED", "Too many booking requests")
+    with _lock:
+        if user_id not in _user_locks:
+            _user_locks[user_id] = threading.Lock()
+        user_lock = _user_locks[user_id]
+
+    with user_lock:
+        bucket = _buckets.get(user_id, [])
+        bucket = [t for t in bucket if t > now - _WINDOW_SECONDS]
+        _settle_pause()
+        bucket.append(now)
+        _buckets[user_id] = bucket
+        if len(bucket) > _MAX_REQUESTS:
+            raise AppError(429, "RATE_LIMITED", "Too many booking requests")
