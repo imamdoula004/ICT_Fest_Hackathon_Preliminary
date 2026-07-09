@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%">
+  <style>
+    @keyframes zapAvailability {
+      0% { opacity: 0; transform: scale(1); }
+      30% { opacity: 1; transform: scale(1); }
+      50% { opacity: 1; fill: #ef4444; transform: scale(1.1); }
+      80% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 0; }
+    }
+    .text { font-family: 'Segoe UI', sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', sans-serif; font-size: 15px; font-weight: bold; fill: #60a5fa; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .zap-box { fill: #3b82f6; stroke: #2563eb; stroke-width: 2; rx: 6; }
+  </style>
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+  
+  <text x="30" y="35" class="title">Availability Cache Invalidation on Booking Cancellation</text>
+
+  <g transform="translate(40, 50)">
+    <!-- Booking Cancellation -->
+    <rect x="0" y="20" width="150" height="60" class="box" stroke="#ef4444" />
+    <text x="75" y="55" class="text" text-anchor="middle" font-weight="bold">Cancel Booking</text>
+
+    <!-- Cache box -->
+    <rect x="350" y="20" width="180" height="60" class="zap-box" style="animation: zapAvailability 4s infinite ease-in-out;" />
+    <text x="440" y="45" class="text" text-anchor="middle" font-weight="bold">Availability Cache</text>
+    <text x="440" y="65" class="text" text-anchor="middle" font-size="10" fill="#9ca3af">CLEARED FOR DATE</text>
+
+    <!-- Arrow -->
+    <path d="M 150 50 L 350 50" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="4" marker-end="url(#arrow)" />
+    <text x="250" y="40" class="text" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="middle">INVALIDATE DATE</text>
+  </g>
+  
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 10 5 L 0 8 z" fill="#ef4444" />
+    </marker>
+  </defs>
+</svg>

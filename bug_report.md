@@ -458,6 +458,8 @@ def invalidate_report(org_id: int) -> None:
 ```
 * **Why/How it was fixed**: Added a call to `cache.invalidate_availability(...)` inside `cancel_booking` using the booking's room ID and start time date.
 
+![Availability Invalidation](docs/bug19_cancel_cache.svg)
+
 ---
 
 ## 🧪 Testing & Verification
