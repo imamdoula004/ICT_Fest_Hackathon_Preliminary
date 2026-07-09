@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="100%">
+  <style>
+    @keyframes pagIndicator {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(240px, 0); }
+      100% { transform: translate(240px, 0); }
+    }
+    .text { font-family: 'Segoe UI', sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', sans-serif; font-size: 15px; font-weight: bold; fill: #60a5fa; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .active-box { fill: #1e3a8a; stroke: #3b82f6; stroke-width: 2; rx: 6; }
+  </style>
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+  
+  <text x="30" y="35" class="title">Pagination Pipeline (offset = (page - 1) * limit)</text>
+
+  <g transform="translate(40, 50)">
+    <!-- Booking 1 -->
+    <rect x="0" y="20" width="100" height="50" class="box" />
+    <text x="50" y="45" class="text" text-anchor="middle">Book 1</text>
+    <text x="50" y="62" class="text" text-anchor="middle" font-size="9" fill="#9ca3af">08:00 UTC</text>
+
+    <!-- Booking 2 -->
+    <rect x="110" y="20" width="100" height="50" class="box" />
+    <text x="160" y="45" class="text" text-anchor="middle">Book 2</text>
+    <text x="160" y="62" class="text" text-anchor="middle" font-size="9" fill="#9ca3af">10:00 UTC</text>
+
+    <!-- Booking 3 -->
+    <rect x="240" y="20" width="100" height="50" class="box" />
+    <text x="290" y="45" class="text" text-anchor="middle">Book 3</text>
+    <text x="290" y="62" class="text" text-anchor="middle" font-size="9" fill="#9ca3af">12:00 UTC</text>
+
+    <!-- Booking 4 -->
+    <rect x="350" y="20" width="100" height="50" class="box" />
+    <text x="400" y="45" class="text" text-anchor="middle">Book 4</text>
+    <text x="400" y="62" class="text" text-anchor="middle" font-size="9" fill="#9ca3af">14:00 UTC</text>
+
+    <!-- Sliding Window Indicator -->
+    <rect x="-5" y="15" width="220" height="60" fill="none" stroke="#10b981" stroke-width="3" rx="8" style="animation: pagIndicator 4s infinite alternate ease-in-out;" />
+    <text x="100" y="100" class="text" fill="#10b981" font-size="11" font-weight="bold">Sliding Page Limit (limit=2)</text>
+  </g>
+</svg>

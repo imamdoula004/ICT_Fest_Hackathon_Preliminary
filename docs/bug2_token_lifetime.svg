@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 160" width="100%">
+  <style>
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 100%; }
+      100% { width: 100%; }
+    }
+    .text { font-family: 'Segoe UI', sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', sans-serif; font-size: 14px; font-weight: bold; }
+    .bar-bg { fill: #1f2937; rx: 4; }
+    .bar-fill-err { fill: #ef4444; rx: 4; }
+    .bar-fill-ok { fill: #10b981; rx: 4; }
+  </style>
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+  
+  <!-- Correct Lifetime -->
+  <g transform="translate(40, 20)">
+    <text x="0" y="20" class="title" fill="#34d399">Correct Expiration (15 Minutes)</text>
+    <rect x="0" y="30" width="320" height="12" class="bar-bg" />
+    <rect x="0" y="30" width="320" height="12" class="bar-fill-ok" style="animation: progress 4s infinite ease-in-out;" />
+    <text x="330" y="41" class="text" fill="#34d399">✓ 900 seconds</text>
+  </g>
+
+  <!-- Buggy Lifetime -->
+  <g transform="translate(420, 20)">
+    <text x="0" y="20" class="title" fill="#f87171">Buggy Expiration (15 Hours)</text>
+    <rect x="0" y="30" width="320" height="12" class="bar-bg" />
+    <rect x="0" y="30" width="320" height="12" class="bar-fill-err" style="animation: progress 4s infinite ease-in-out;" />
+    <text x="330" y="41" class="text" fill="#f87171">✗ 54,000 seconds (60x longer)</text>
+  </g>
+</svg>

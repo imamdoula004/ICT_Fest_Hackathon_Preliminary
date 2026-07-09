@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%">
+  <style>
+    @keyframes checkValidator {
+      0% { transform: translate(0, 0); opacity: 0; }
+      10% { opacity: 1; }
+      50% { transform: translate(250px, 0); }
+      90% { opacity: 1; }
+      100% { transform: translate(250px, 0); opacity: 0; }
+    }
+    .text { font-family: 'Segoe UI', sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', sans-serif; font-size: 15px; font-weight: bold; fill: #60a5fa; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .packet-bad { fill: #ef4444; rx: 4; }
+  </style>
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+  
+  <text x="30" y="35" class="title">Booking Validation (Start &amp; Duration Checks)</text>
+
+  <g transform="translate(40, 50)">
+    <!-- Validator Stage -->
+    <rect x="250" y="20" width="160" height="70" class="box" stroke="#f59e0b" />
+    <text x="330" y="50" class="text" text-anchor="middle" font-weight="bold">Start &amp; Duration Checks</text>
+    <text x="330" y="70" class="text" text-anchor="middle" font-size="10" fill="#9ca3af">Min 1h, Future only</text>
+
+    <!-- Animated Packet (Bad input: 0.5 hours) -->
+    <g style="animation: checkValidator 4s infinite ease-in-out;">
+      <rect x="10" y="30" width="120" height="40" class="packet-bad" />
+      <text x="70" y="48" class="text" font-size="10" text-anchor="middle" font-weight="bold">Duration: 0.5 hrs</text>
+      <text x="70" y="62" class="text" font-size="9" text-anchor="middle" fill="#fee2e2">INVALID WINDOW (400)</text>
+    </g>
+  </g>
+</svg>

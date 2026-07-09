@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%">
+  <style>
+    @keyframes slider {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(250px, 0); }
+      100% { transform: translate(500px, 0); }
+    }
+    .text { font-family: 'Segoe UI', sans-serif; font-size: 13px; fill: #ffffff; }
+    .title { font-family: 'Segoe UI', sans-serif; font-size: 15px; font-weight: bold; fill: #60a5fa; }
+    .box { fill: #1f2937; stroke: #374151; stroke-width: 2; rx: 6; }
+    .tier-ok { fill: #10b981; }
+    .tier-half { fill: #f59e0b; }
+    .tier-zero { fill: #ef4444; }
+  </style>
+  <rect width="100%" height="100%" fill="#0b0f19" rx="8" />
+  
+  <text x="30" y="35" class="title">Cancellation Refund Notice Scale</text>
+
+  <g transform="translate(40, 50)">
+    <!-- Scale Background Tiers -->
+    <!-- <24h Tier -->
+    <rect x="0" y="30" width="200" height="20" class="tier-zero" rx="4" />
+    <text x="100" y="20" class="text" text-anchor="middle" font-size="11">0% Refund (&lt;24h notice)</text>
+    
+    <!-- 24h-48h Tier -->
+    <rect x="200" y="30" width="200" height="20" class="tier-half" rx="4" />
+    <text x="300" y="20" class="text" text-anchor="middle" font-size="11">50% Refund (24h-48h notice)</text>
+
+    <!-- >=48h Tier -->
+    <rect x="400" y="30" width="200" height="20" class="tier-ok" rx="4" />
+    <text x="500" y="20" class="text" text-anchor="middle" font-size="11">100% Refund (&gt;=48h notice)</text>
+
+    <!-- Slider Indicator -->
+    <circle cx="100" cy="40" r="10" fill="#3b82f6" stroke="#2563eb" stroke-width="2" style="animation: slider 6s infinite alternate ease-in-out;" />
+  </g>
+</svg>
