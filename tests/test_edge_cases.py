@@ -326,3 +326,37 @@ def test_rate_limiting():
     # The 21st is 429
     assert status_codes[20] == 429
 
+
+def test_cancellation_availability_cache_invalidation():
+    org = f"org-cache-c-{datetime.now().timestamp()}"
+    client.post("/auth/register", json={"org_name": org, "username": "bob", "password": "password"})
+    login = client.post("/auth/login", json={"org_name": org, "username": "bob", "password": "password"})
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    room = client.post("/rooms", json={"name": "Room A", "capacity": 2, "hourly_rate_cents": 1000}, headers=headers)
+    room_id = room.json()["id"]
+
+    start = _future(24)
+    end = _future(26)
+    date_str = start[:10]  # YYYY-MM-DD
+
+    # Create booking
+    b = client.post("/bookings", json={"room_id": room_id, "start_time": start, "end_time": end}, headers=headers)
+    assert b.status_code == 201
+    b_id = b.json()["id"]
+
+    # Check availability: should be busy
+    avail1 = client.get(f"/rooms/{room_id}/availability?date={date_str}", headers=headers)
+    assert avail1.status_code == 200
+    assert len(avail1.json()["busy"]) == 1
+
+    # Cancel booking
+    cancel = client.post(f"/bookings/{b_id}/cancel", headers=headers)
+    assert cancel.status_code == 200
+
+    # Check availability: should be empty (reflects current state immediately)
+    avail2 = client.get(f"/rooms/{room_id}/availability?date={date_str}", headers=headers)
+    assert avail2.status_code == 200
+    assert len(avail2.json()["busy"]) == 0
+
+

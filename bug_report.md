@@ -32,6 +32,7 @@ Here is a quick summary table of all the 17 bugs resolved in this repository:
 | **16** | Export Security Leak | `app/routers/admin.py` | Security | Verified room organization ownership before CSV export. |
 | **17** | Concurrency Deadlock | `app/services/notifications.py`| Concurrency | Standardised locking order to Email -> Audit lock. |
 | **18** | Cache Dictionary Race | `app/cache.py` | Concurrency | Added thread lock to prevent concurrent modification exceptions. |
+| **19** | Availability Cache Leak| `app/routers/bookings.py` | Cache | Invalidated availability cache on booking cancellation. |
 
 ---
 
@@ -439,18 +440,38 @@ def invalidate_report(org_id: int) -> None:
 
 ---
 
+### Bug 19: Availability Cache Leak on Booking Cancellation
+* **File**: `app/routers/bookings.py` (L224-L227)
+* **Buggy Code**:
+```python
+    stats.record_cancel(booking.room_id, booking.price_cents)
+    cache.invalidate_report(user.org_id)
+    notifications.notify_cancelled(booking)
+```
+* **Why it was a problem**: Cancelling a booking did not invalidate the in-memory room availability cache for that room and date. Consequently, subsequent availability queries continued to return the cancelled slot as "busy" (violating Business Rule 13: "Reflects the current state immediately").
+* **Corrected Code**:
+```python
+    stats.record_cancel(booking.room_id, booking.price_cents)
+    cache.invalidate_availability(booking.room_id, booking.start_time.date().isoformat())
+    cache.invalidate_report(user.org_id)
+    notifications.notify_cancelled(booking)
+```
+* **Why/How it was fixed**: Added a call to `cache.invalidate_availability(...)` inside `cancel_booking` using the booking's room ID and start time date.
+
+---
+
 ## 🧪 Testing & Verification
 
 We implemented a robust test suite in `tests/test_edge_cases.py` to assert correct behavior.
 
-All 11 tests passed successfully:
+All 13 tests passed successfully:
 ```
 ============================= test session starts =============================
 platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0
-collected 11 items
+collected 13 items
 
-tests/test_edge_cases.py ..........                                      [ 90%]
-tests/test_smoke.py .                                                    [100%]
+tests\test_edge_cases.py ............                                    [ 92%]
+tests\test_smoke.py .                                                    [100%]
 
-======================== 11 passed, 1 warning in 32.46s ========================
+======================= 13 passed, 1 warning in 81.59s ========================
 ```
